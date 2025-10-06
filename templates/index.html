@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis Tool | AI-Powered Text Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .text-gradient {
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .file-upload {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-upload-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .file-name {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="vanta-bg" class="gradient-bg w-full h-screen fixed -z-10"></div>
+    
+    <div class="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+        <div class="w-full max-w-4xl mx-auto">
+            <div class="text-center mb-12" data-aos="fade-down">
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Sentiment Analysis Tool</h1>
+                <p class="text-xl text-gray-200 max-w-2xl mx-auto">AI-powered text analysis to understand emotions and opinions in your content</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Single Text Analysis Card -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 card-hover" data-aos="fade-right">
+                    <div class="p-1 gradient-bg"></div>
+                    <div class="p-8">
+                        <div class="flex items-center mb-6">
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                                <i data-feather="edit-3" class="w-6 h-6"></i>
+                            </div>
+                            <h2 class="text-2xl font-semibold text-gray-800">Text Analysis</h2>
+                        </div>
+                        
+                        {% if error %}
+                        <div class="mb-6 p-4 bg-red-50 text-red-600 rounded-lg border border-red-200 animate__animated animate__shakeX">
+                            <div class="flex items-center">
+                                <i data-feather="alert-triangle" class="mr-3"></i>
+                                <div>
+                                    <h3 class="font-medium">Analysis Error</h3>
+                                    <p class="text-sm mt-1">{{ error }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <form action="/predict" method="post">
+                            <textarea name="text" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" rows="5" placeholder="Type or paste your text here (e.g., product review, social media post, customer feedback)..."></textarea>
+                            <button type="submit" class="mt-6 w-full gradient-bg text-white font-medium py-3 px-6 rounded-lg hover:opacity-90 transition-all duration-200 flex items-center justify-center">
+                                <i data-feather="activity" class="mr-2"></i> Analyze Sentiment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Batch Analysis Card -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 card-hover" data-aos="fade-left">
+                    <div class="p-1 gradient-bg"></div>
+                    <div class="p-8">
+                        <div class="flex items-center mb-6">
+                            <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                                <i data-feather="file-text" class="w-6 h-6"></i>
+                            </div>
+                            <h2 class="text-2xl font-semibold text-gray-800">Batch Analysis</h2>
+                        </div>
+                        
+                        <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
+                            <div class="file-upload w-full border-2 border-dashed border-gray-200 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 transition-all duration-200 mb-6" id="dropArea">
+                                <div class="flex flex-col items-center justify-center">
+                                    <i data-feather="upload" class="w-12 h-12 text-gray-400 mb-3"></i>
+                                    <h3 class="text-lg font-medium text-gray-700">Upload your file</h3>
+                                    <p class="text-sm text-gray-500 mt-1">Supports CSV, XLS, XLSX formats</p>
+                                    <input type="file" name="file" id="fileInput" class="file-upload-input" accept=".csv,.xls,.xlsx" />
+                                    <div id="fileName" class="file-name"></div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="w-full gradient-bg text-white font-medium py-3 px-6 rounded-lg hover:opacity-90 transition-all duration-200 flex items-center justify-center">
+                                <i data-feather="database" class="mr-2"></i> Analyze Multiple Texts
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-16 text-center text-gray-300">
+                <p class="flex items-center justify-center">
+                    <i data-feather="zap" class="mr-2"></i> Powered by advanced Natural Language Processing
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+    <script>
+        VANTA.GLOBE({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x4facfe,
+            backgroundColor: 0x0,
+            size: 0.8
+        });
+    </script>
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+        feather.replace();
+        
+        // File upload handling
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'No file selected';
+            document.getElementById('fileName').textContent = fileName;
+            
+            // Change border color to indicate file selected
+            if (e.target.files[0]) {
+                document.getElementById('dropArea').classList.add('border-blue-500');
+                document.getElementById('dropArea').classList.remove('border-gray-200');
+            } else {
+                document.getElementById('dropArea').classList.remove('border-blue-500');
+                document.getElementById('dropArea').classList.add('border-gray-200');
+            }
+        });
+        
+        // Make the entire drop area clickable
+        document.getElementById('dropArea').addEventListener('click', function() {
+            document.getElementById('fileInput').click();
+        });
+    </script>
+</body>
+</html>

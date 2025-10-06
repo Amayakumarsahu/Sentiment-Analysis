@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentiment Analysis Result</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+  <style>
+    .sentiment-positive { color: #3498db; }
+    .sentiment-negative { color: #e74c3c; }
+    .sentiment-neutral { color: #f39c12; }
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .card-shadow {
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+    }
+  </style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-md mx-auto" data-aos="fade-up" data-aos-duration="500">
+    <div class="bg-white rounded-xl p-8 card-shadow">
+      {% if error %}
+        <div class="text-center">
+          <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i data-feather="alert-circle" class="text-red-600 w-8 h-8"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Error Occurred</h2>
+          <p class="text-gray-600 mb-6">{{ error }}</p>
+        </div>
+      {% else %}
+        <div class="text-center">
+          <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i data-feather="check-circle" class="text-indigo-600 w-8 h-8"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Analysis Result</h2>
+          <div class="mb-6 text-left">
+            <div class="mb-4">
+              <p class="text-sm font-medium text-gray-500">Analyzed Text</p>
+              <p class="text-gray-800 bg-gray-50 p-3 rounded-lg mt-1">"{{ text }}"</p>
+            </div>
+            
+            <div class="mb-4">
+              <p class="text-sm font-medium text-gray-500">Sentiment</p>
+              <p class="text-lg font-semibold sentiment-{{ sentiment|lower }} mt-1 flex items-center">
+                {% if sentiment == "POSITIVE" %}
+                  <i data-feather="thumbs-up" class="mr-2"></i>
+                {% elif sentiment == "NEGATIVE" %}
+                  <i data-feather="thumbs-down" class="mr-2"></i>
+                {% else %}
+                  <i data-feather="minus" class="mr-2"></i>
+                {% endif %}
+                {{ sentiment }}
+              </p>
+            </div>
+            
+            <div class="mb-4">
+              <p class="text-sm font-medium text-gray-500">Confidence Level</p>
+              <div class="mt-2">
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div class="bg-blue-500 h-2.5 rounded-full" style="width: {{ confidence|float * 100 }}%"></div>
+                </div>
+                <p class="text-right text-sm text-gray-600 mt-1">{{ "%.2f"|format(confidence|float * 100) }}%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      
+      <a href="/" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200">
+        <i data-feather="arrow-left" class="mr-2 w-4 h-4"></i>
+        Back to Home
+      </a>
+    </div>
+  </div>
+
+  <script>
+    AOS.init();
+    feather.replace();
+  </script>
+</body>
+</html>
